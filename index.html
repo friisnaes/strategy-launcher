@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Strategy Execution Observatory™ — Executive Launcher</title>
+<meta name="description" content="Et ledelsessystem til at måle strategisk sundhed, organisatorisk friktion og execution momentum.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+/* ====================================================================
+   DESIGN TOKENS
+   Matched to Strategy Execution Observatory™ module family
+   ==================================================================== */
+:root {
+  /* Navy scale */
+  --n-950: #050810;
+  --n-900: #070b14;
+  --n-850: #0a1628;
+  --n-800: #0d1b2a;
+  --n-750: #101f30;
+  --n-700: #142536;
+  --n-650: #182c40;
+  --n-600: #1e3550;
+
+  /* Gold — used with semantic weight */
+  --g-500: #c9a84c;
+  --g-400: #d4b868;
+  --g-dim: rgba(201,168,76,0.10);
+  --g-border: rgba(201,168,76,0.20);
+  --g-glow: rgba(201,168,76,0.05);
+
+  /* Text */
+  --t-100: #eae8e3;
+  --t-200: rgba(234,232,227,0.76);
+  --t-300: rgba(234,232,227,0.50);
+  --t-400: rgba(234,232,227,0.30);
+  --t-inv: #0a1628;
+
+  /* Lines */
+  --l-1: rgba(234,232,227,0.05);
+  --l-2: rgba(234,232,227,0.09);
+  --l-3: rgba(234,232,227,0.14);
+
+  /* Surfaces */
+  --s-card: rgba(14,27,42,0.50);
+  --s-card-h: rgba(18,32,50,0.70);
+  --s-panel: rgba(10,22,40,0.65);
+
+  /* Fonts */
+  --f-display: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --f-ui: 'DM Sans', 'Helvetica Neue', Arial, sans-serif;
+
+  /* Spacing system */
+  --sp-section: clamp(96px, 10vw, 140px);
+  --sp-inner: 36px;
+  --sp-card-gap: 24px;
+
+  /* Layout */
+  --max-w: 1380px;
+  --gutter: clamp(20px, 3vw, 48px);
+  --radius: 3px;
+}
+
+/* ====================================================================
+   RESET
+   ==================================================================== */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:60px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+body{font-family:var(--f-ui);font-size:17px;line-height:1.65;color:var(--t-100);background:var(--n-850)}
+::selection{background:var(--g-500);color:var(--t-inv)}
+a{color:var(--g-500);text-decoration:none;transition:opacity .2s}
+a:hover{opacity:.82}
+
+/* ====================================================================
+   LAYOUT CONTAINER — 12-col conceptual grid
+   ==================================================================== */
+.frame{
+  max-width:var(--max-w);
+  margin:0 auto;
+  padding:0 var(--gutter);
+}
+
+.section{padding:var(--sp-section) 0}
+.section--heavy{padding:clamp(110px,12vw,160px) 0} /* heavier weight */
+
+.rule{height:1px;border:none;background:var(--l-1);margin:0}
+
+/* ====================================================================
+   TYPOGRAPHY — strict hierarchy
+   ==================================================================== */
+.eyebrow{
+  font-family:var(--f-ui);
+  font-size:11.5px;
+  font-weight:600;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--g-500);
+  margin-bottom:16px;
+}
+.eyebrow::before{
+  content:'';display:inline-block;width:24px;height:1px;
+  background:var(--g-500);vertical-align:middle;margin-right:12px;
+}
+
+.h-hero{
+  font-family:var(--f-display);
+  font-size:clamp(52px,6vw,76px);
+  font-weight:600;
+  line-height:1.06;
+  color:var(--t-100);
+  letter-spacing:-.01em;
+}
+
+.h-section{
+  font-family:var(--f-display);
+  font-size:clamp(32px,4vw,44px);
+  font-weight:600;
+  line-height:1.15;
+  color:var(--t-100);
+}
+
+.h-card{
+  font-family:var(--f-display);
+  font-size:24px;
+  font-weight:600;
+  line-height:1.2;
+  color:var(--t-100);
+}
+
+.lead{
+  font-size:17px;
+  line-height:1.65;
+  color:var(--t-200);
+  max-width:620px;
+}
+
+.body-sm{
+  font-size:15px;
+  line-height:1.6;
+  color:var(--t-300);
+}
+
+/* ====================================================================
+   TOPBAR
+   ==================================================================== */
+.topbar{
+  position:fixed;inset:0 0 auto 0;z-index:200;
+  height:52px;
+  display:flex;align-items:center;
+  padding:0 var(--gutter);
+  background:rgba(10,22,40,.86);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--l-1);
+  transition:background .3s;
+}
+.topbar.scrolled{background:rgba(7,11,20,.96)}
+
+.topbar__brand{
+  font-family:var(--f-display);
+  font-size:13.5px;font-weight:600;
+  letter-spacing:.04em;
+  color:var(--g-500);
+  margin-right:auto;
+  white-space:nowrap;
+}
+
+.topbar__nav{display:flex;align-items:center;gap:22px;list-style:none}
+.topbar__nav a{
+  font-size:12px;font-weight:500;letter-spacing:.04em;
+  text-transform:uppercase;color:var(--t-300);transition:color .2s;
+}
+.topbar__nav a:hover{color:var(--g-500);opacity:1}
+
+.topbar__cta{
+  margin-left:18px;padding:6px 16px;
+  font-size:11.5px;font-weight:600;letter-spacing:.02em;
+  color:var(--t-inv);background:var(--g-500);
+  border:none;border-radius:var(--radius);
+  text-decoration:none;transition:opacity .2s;
+}
+.topbar__cta:hover{opacity:.88;color:var(--t-inv)}
+
+.topbar__toggle{
+  display:none;background:none;border:none;cursor:pointer;
+  width:28px;height:28px;position:relative;margin-left:14px;
+}
+.topbar__toggle span{
+  display:block;width:18px;height:1.5px;background:var(--t-200);
+  position:absolute;left:5px;transition:all .25s;
+}
+.topbar__toggle span:nth-child(1){top:8px}
+.topbar__toggle span:nth-child(2){top:13px}
+.topbar__toggle span:nth-child(3){top:18px}
+
+/* ====================================================================
+   HERO — 7/5 grid split
+   ==================================================================== */
+.hero{padding:128px 0 88px;position:relative}
+
+.hero__grid{
+  display:grid;
+  grid-template-columns:7fr 5fr;
+  gap:56px;
+  align-items:center;
+}
+
+.hero__subtitle{
+  font-size:clamp(17px,1.8vw,20px);
+  line-height:1.5;color:var(--t-200);
+  margin:24px 0 16px;max-width:520px;
+}
+
+.hero__def{
+  font-size:15px;line-height:1.6;color:var(--t-300);
+  margin-bottom:40px;max-width:480px;
+}
+
+.hero__ctas{display:flex;gap:12px;flex-wrap:wrap}
+
+/* Buttons */
+.btn{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:12px 24px;
+  font-family:var(--f-ui);font-size:13.5px;font-weight:600;
+  border-radius:var(--radius);text-decoration:none;
+  transition:all .2s;cursor:pointer;
+}
+.btn--gold{color:var(--t-inv);background:var(--g-500);border:1px solid var(--g-500)}
+.btn--gold:hover{opacity:.88;transform:translateY(-1px);color:var(--t-inv)}
+.btn--ghost{color:var(--t-200);background:transparent;border:1px solid var(--l-3)}
+.btn--ghost:hover{border-color:var(--g-border);color:var(--g-500)}
+
+/* Observatory panel */
+.obs{
+  background:var(--n-800);
+  border:1px solid var(--l-2);
+  border-radius:var(--radius);
+  overflow:hidden;
+}
+
+.obs__head{
+  padding:14px 20px;
+  border-bottom:1px solid var(--l-1);
+  display:flex;align-items:center;gap:10px;
+}
+.obs__dot{width:5px;height:5px;border-radius:50%;background:var(--g-500);opacity:.55}
+.obs__label{
+  font-size:10.5px;font-weight:600;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--t-400);
+}
+
+.obs__row{
+  padding:20px 22px;
+  border-bottom:1px solid var(--l-1);
+  display:flex;gap:16px;align-items:flex-start;
+}
+.obs__row:last-of-type{border-bottom:none}
+
+.obs__icon{
+  width:36px;height:36px;border-radius:50%;
+  border:1px solid var(--g-border);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;font-size:13px;color:var(--g-500);
+  background:var(--g-glow);
+}
+
+.obs__body{flex:1}
+.obs__abbr{font-size:10.5px;font-weight:700;letter-spacing:.1em;color:var(--g-500);text-transform:uppercase}
+.obs__name{font-size:14px;font-weight:500;color:var(--t-100);margin-top:2px}
+.obs__desc{font-size:12.5px;color:var(--t-300);margin-top:3px;line-height:1.4}
+.obs__bar{height:3px;border-radius:2px;background:var(--l-2);margin-top:10px;position:relative;overflow:hidden}
+.obs__bar span{position:absolute;inset:0 auto 0 0;background:var(--g-500);border-radius:2px;opacity:.5}
+
+.obs__foot{
+  padding:10px 20px;border-top:1px solid var(--l-1);
+  font-size:10.5px;color:var(--t-400);text-align:center;letter-spacing:.03em;
+}
+
+/* ====================================================================
+   DEFINITION STRIP — lightest visual weight
+   ==================================================================== */
+.strip{
+  padding:44px 0;
+  background:var(--n-900);
+  border-top:1px solid var(--l-1);
+  border-bottom:1px solid var(--l-1);
+}
+
+.strip__grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:28px;
+}
+
+.strip__item{
+  padding-left:18px;
+  border-left:2px solid var(--g-border);
+}
+.strip__abbr{
+  font-size:11px;font-weight:700;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--g-500);margin-bottom:5px;
+}
+.strip__name{
+  font-family:var(--f-display);font-size:18px;font-weight:600;
+  color:var(--t-100);margin-bottom:5px;
+}
+.strip__desc{font-size:13.5px;line-height:1.5;color:var(--t-300)}
+
+/* ====================================================================
+   MODULE GRID — 4/4/4
+   ==================================================================== */
+.mgrid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:var(--sp-card-gap);
+  margin-top:var(--sp-inner);
+}
+
+.mcard{
+  background:var(--s-card);
+  border:1px solid var(--l-1);
+  border-radius:var(--radius);
+  padding:36px 28px 32px;
+  display:flex;flex-direction:column;
+  position:relative;
+  transition:background .25s,border-color .25s;
+}
+.mcard::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:var(--g-500);opacity:0;transition:opacity .25s;
+}
+.mcard:hover{background:var(--s-card-h);border-color:var(--l-2)}
+.mcard:hover::after{opacity:1}
+
+.mcard__tag{
+  font-size:10px;font-weight:600;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--t-400);margin-bottom:14px;
+}
+.mcard__name{
+  font-family:var(--f-display);font-size:25px;font-weight:600;
+  color:var(--t-100);margin-bottom:3px;
+}
+.mcard__sub{
+  font-size:11px;font-weight:600;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--g-500);margin-bottom:16px;
+}
+.mcard__desc{
+  font-size:15px;line-height:1.6;color:var(--t-200);margin-bottom:18px;
+}
+.mcard__meta{margin-bottom:24px;flex:1}
+.mcard__row{
+  display:flex;gap:8px;padding:7px 0;
+  border-bottom:1px solid var(--l-1);font-size:13px;line-height:1.4;
+}
+.mcard__key{color:var(--t-400);min-width:85px;font-weight:500;white-space:nowrap}
+.mcard__val{color:var(--t-200)}
+
+.mcard__cta{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:14px;font-weight:600;color:var(--g-500);
+  text-decoration:none;transition:gap .2s;
+}
+.mcard__cta:hover{gap:12px;opacity:1}
+.mcard__cta::after{content:'\2192'}
+
+/* ====================================================================
+   FLOW — 3 horizontal steps
+   ==================================================================== */
+.flow{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:0;margin-top:var(--sp-inner);position:relative;
+}
+.flow::before{
+  content:'';position:absolute;top:30px;
+  left:calc(16.66%);right:calc(16.66%);
+  height:1px;background:var(--l-3);
+}
+
+.flow__node{
+  display:flex;flex-direction:column;
+  align-items:center;text-align:center;
+  padding:0 12px;
+}
+.flow__num{
+  width:50px;height:50px;border-radius:50%;
+  border:1px solid var(--g-border);background:var(--n-850);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--f-display);font-size:19px;font-weight:600;
+  color:var(--g-500);margin-bottom:22px;position:relative;z-index:1;
+}
+.flow__title{
+  font-family:var(--f-display);font-size:21px;font-weight:600;
+  color:var(--t-100);margin-bottom:10px;
+}
+.flow__desc{font-size:14.5px;line-height:1.6;color:var(--t-200);max-width:270px}
+.flow__time{
+  font-size:11px;font-weight:500;color:var(--t-400);
+  margin-top:12px;letter-spacing:.04em;
+}
+
+.flow__coda{
+  margin-top:52px;padding:30px 34px;
+  background:var(--g-glow);border:1px solid var(--g-border);
+  border-radius:var(--radius);
+  font-size:16px;line-height:1.6;color:var(--t-200);
+}
+.flow__coda strong{color:var(--t-100);font-weight:600}
+
+/* ====================================================================
+   GUIDE TABS
+   ==================================================================== */
+.gtabs{display:flex;gap:2px;margin-top:var(--sp-inner)}
+
+.gtab{
+  padding:13px 26px;
+  font-family:var(--f-ui);font-size:13.5px;font-weight:600;
+  background:var(--s-card);border:1px solid var(--l-1);
+  border-bottom:none;border-radius:var(--radius) var(--radius) 0 0;
+  color:var(--t-300);cursor:pointer;transition:all .2s;
+}
+.gtab:hover{color:var(--t-100)}
+.gtab.on{background:var(--n-700);color:var(--g-500);border-color:var(--l-2)}
+
+.gpane{
+  display:none;background:var(--n-700);
+  border:1px solid var(--l-2);
+  border-radius:0 var(--radius) var(--radius) var(--radius);
+  padding:38px 38px 34px;
+}
+.gpane.on{display:block}
+
+.gpane__purpose{
+  font-size:16px;line-height:1.65;color:var(--t-200);
+  margin-bottom:30px;max-width:620px;
+}
+
+.gpane__h4{
+  font-size:11px;font-weight:600;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--g-500);margin-bottom:16px;
+}
+
+.gpane__steps{list-style:none;counter-reset:s;margin-bottom:26px}
+.gpane__steps li{
+  counter-increment:s;
+  padding:10px 0 10px 42px;
+  border-bottom:1px solid var(--l-1);
+  color:var(--t-200);font-size:15px;line-height:1.55;
+  position:relative;
+}
+.gpane__steps li::before{
+  content:counter(s);position:absolute;left:0;top:10px;
+  font-family:var(--f-ui);font-size:11px;font-weight:700;
+  color:var(--g-500);
+  width:24px;height:24px;
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--g-border);border-radius:50%;
+}
+
+.gpane__bp{margin-bottom:22px}
+.gpane__bp ul{list-style:none}
+.gpane__bp li{
+  padding:4px 0;color:var(--t-200);font-size:14px;
+  display:flex;align-items:baseline;gap:10px;
+}
+.gpane__bp li::before{
+  content:'\00B7';color:var(--g-500);font-weight:700;font-size:18px;flex-shrink:0;
+}
+
+.gpane__note{
+  margin-top:6px;padding:14px 20px;
+  background:var(--g-glow);border-left:2px solid var(--g-border);
+  font-size:13.5px;line-height:1.6;color:var(--t-200);
+}
+
+/* ====================================================================
+   METHOD — 6/6 heavy split
+   ==================================================================== */
+.method{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:48px;
+  margin-top:var(--sp-inner);
+}
+
+.method__heading{
+  font-family:var(--f-display);font-size:21px;font-weight:600;
+  color:var(--t-100);margin-bottom:22px;
+  padding-bottom:14px;border-bottom:1px solid var(--l-2);
+}
+
+.method__list{list-style:none}
+.method__list li{
+  padding:9px 0;font-size:15px;line-height:1.6;color:var(--t-200);
+  display:flex;align-items:baseline;gap:12px;
+}
+.method__list li::before{flex-shrink:0;font-size:13px}
+.method__list--do li::before{content:'\2714';color:var(--g-500)}
+.method__list--dont li::before{content:'\2718';color:var(--t-400)}
+
+.method__ssi{
+  margin-top:52px;padding:28px 32px;
+  background:var(--g-glow);border:1px solid var(--g-border);
+  border-radius:var(--radius);
+}
+.method__ssi strong{
+  color:var(--g-500);font-weight:700;font-size:11.5px;
+  letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:6px;
+}
+.method__ssi p{font-size:15px;line-height:1.6;color:var(--t-200)}
+
+/* ====================================================================
+   REFERENCES — 2-col editorial grid
+   ==================================================================== */
+.refs{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:20px;
+  margin-top:var(--sp-inner);
+}
+
+.ref{
+  padding:24px 26px;
+  background:var(--s-card);border:1px solid var(--l-1);
+  border-radius:var(--radius);transition:border-color .2s;
+}
+.ref:hover{border-color:var(--l-2)}
+
+.ref__source{
+  font-size:10px;font-weight:600;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--t-400);margin-bottom:7px;
+}
+.ref__title{font-size:15.5px;font-weight:600;color:var(--t-100);line-height:1.35;margin-bottom:5px}
+.ref__desc{font-size:13.5px;line-height:1.5;color:var(--t-300);margin-bottom:10px}
+.ref__link{font-size:12.5px;font-weight:600;color:var(--g-500)}
+
+/* ====================================================================
+   CLOSING — heavy panel
+   ==================================================================== */
+.closing{
+  padding:clamp(100px,11vw,150px) 0;
+  background:var(--n-900);
+  border-top:1px solid var(--l-1);
+  border-bottom:1px solid var(--l-1);
+  text-align:center;
+}
+
+.closing__statement{
+  font-family:var(--f-display);
+  font-size:clamp(24px,3.4vw,36px);
+  font-weight:500;line-height:1.32;
+  color:var(--t-100);
+  max-width:700px;margin:0 auto 22px;
+}
+.closing__sub{
+  font-size:16px;line-height:1.6;color:var(--t-200);
+  max-width:520px;margin:0 auto 44px;
+}
+.closing__ctas{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+
+/* ====================================================================
+   FOOTER
+   ==================================================================== */
+.footer{padding:32px 0}
+.footer__inner{
+  display:flex;justify-content:space-between;align-items:baseline;
+  flex-wrap:wrap;gap:14px;
+}
+.footer__brand{
+  font-family:var(--f-display);font-size:13.5px;font-weight:600;
+  color:var(--g-500);letter-spacing:.03em;
+}
+.footer__note{font-size:11.5px;color:var(--t-400);line-height:1.5;text-align:right}
+
+/* ====================================================================
+   RESPONSIVE
+   ==================================================================== */
+@media(max-width:1199px){
+  .hero__grid{grid-template-columns:1fr;gap:44px}
+  .obs{max-width:420px}
+}
+
+@media(max-width:960px){
+  .strip__grid{grid-template-columns:1fr;gap:20px}
+  .mgrid{grid-template-columns:1fr;gap:20px}
+  .flow{grid-template-columns:1fr;gap:36px}
+  .flow::before{display:none}
+  .method{grid-template-columns:1fr;gap:36px}
+  .refs{grid-template-columns:1fr}
+  .topbar__nav{display:none}
+  .topbar__cta{display:none}
+  .topbar__toggle{display:block}
+  .topbar__nav.open{
+    display:flex;flex-direction:column;
+    position:absolute;top:52px;left:0;right:0;
+    background:rgba(7,11,20,.97);
+    padding:18px var(--gutter) 22px;gap:12px;
+    border-bottom:1px solid var(--l-1);
+  }
+}
+
+@media(max-width:600px){
+  .hero{padding:96px 0 56px}
+  .hero__ctas{flex-direction:column}
+  .btn{width:100%;justify-content:center}
+  .closing__ctas{flex-direction:column;align-items:center}
+  .closing__ctas .btn{width:auto;min-width:200px}
+  .gtabs{flex-direction:column;gap:0}
+  .gtab{border-radius:0;border-bottom:1px solid var(--l-1)}
+  .gpane{border-radius:0 0 var(--radius) var(--radius);padding:26px 22px 22px}
+  .mcard{padding:26px 22px}
+  .footer__inner{flex-direction:column;text-align:center}
+  .footer__note{text-align:center}
+}
+</style>
+</head>
+<body>
+
+<!-- ================================================================
+     A. TOPBAR
+     ================================================================ -->
+<nav class="topbar" id="topbar" role="navigation" aria-label="Hovednavigation">
+  <span class="topbar__brand">Strategy Execution Observatory&#8482;</span>
+  <ul class="topbar__nav" id="navLinks">
+    <li><a href="#overblik">Overblik</a></li>
+    <li><a href="#moduler">Moduler</a></li>
+    <li><a href="#guide">Guide</a></li>
+    <li><a href="#metode">Metode</a></li>
+    <li><a href="#referencer">Referencer</a></li>
+  </ul>
+  <a href="https://friisnaes.github.io/strategy-mgt/" class="topbar__cta">&#197;bn Management</a>
+  <button class="topbar__toggle" id="navToggle" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+
+<!-- ================================================================
+     B. HERO — 7/5 split
+     ================================================================ -->
+<section class="hero" id="overblik">
+  <div class="frame">
+    <div class="hero__grid">
+      <!-- LEFT — 7 cols -->
+      <div>
+        <div class="eyebrow">Strategy Execution Observatory&#8482;</div>
+        <h1 class="h-hero">M&#229;l organisationens strategiske sundhed, f&#248;r execution-problemerne rammer performance.</h1>
+        <p class="hero__subtitle">Et ledelsessystem til at g&#248;re execution-signaler l&#230;sbare, friktion synlig og ledelseshandling mere pr&#230;cis.</p>
+        <p class="hero__def">Systemet samler signalcapture, konsolidering og executive view i &#233;t sammenh&#230;ngende observatorium.</p>
+        <div class="hero__ctas">
+          <a href="https://friisnaes.github.io/strategy-data/" class="btn btn--gold">&#197;bn DataLeverand&#248;r</a>
+          <a href="https://friisnaes.github.io/strategy-admin/" class="btn btn--ghost">&#197;bn Admin</a>
+          <a href="https://friisnaes.github.io/strategy-mgt/" class="btn btn--ghost">&#197;bn Management</a>
+        </div>
+      </div>
+
+      <!-- RIGHT — 5 cols · Observatory instrumentation panel -->
+      <div class="obs">
+        <div class="obs__head">
+          <span class="obs__dot"></span>
+          <span class="obs__label">Observatory Signals</span>
+        </div>
+        <div class="obs__row">
+          <div class="obs__icon">&#9670;</div>
+          <div class="obs__body">
+            <div class="obs__abbr">SSI</div>
+            <div class="obs__name">Strategy Execution Index</div>
+            <div class="obs__desc">Samlet strategisk eksekveringssundhed &#8212; v&#230;gtet sum af 8 komponenter</div>
+            <div class="obs__bar"><span style="width:72%"></span></div>
+          </div>
+        </div>
+        <div class="obs__row">
+          <div class="obs__icon">&#9888;</div>
+          <div class="obs__body">
+            <div class="obs__abbr">OFI</div>
+            <div class="obs__name">Organizational Friction Index</div>
+            <div class="obs__desc">Intern modstand, beslutningsfriktion og koordinationstab</div>
+            <div class="obs__bar"><span style="width:45%"></span></div>
+          </div>
+        </div>
+        <div class="obs__row">
+          <div class="obs__icon">&#8599;</div>
+          <div class="obs__body">
+            <div class="obs__abbr">EMI</div>
+            <div class="obs__name">Execution Momentum Index</div>
+            <div class="obs__desc">Fremdrift, lukkehastighed, beslutningskraft og leverancetillid</div>
+            <div class="obs__bar"><span style="width:63%"></span></div>
+          </div>
+        </div>
+        <div class="obs__foot">Illustrativt &#183; Data indl&#230;ses i modulerne</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     C. DEFINITION STRIP
+     ================================================================ -->
+<div class="strip">
+  <div class="frame">
+    <div class="strip__grid">
+      <div class="strip__item">
+        <div class="strip__abbr">SSI</div>
+        <div class="strip__name">Strategisk sundhed</div>
+        <div class="strip__desc">Hvor sund er organisationens eksekvering af strategien &#8212; m&#229;lt p&#229; tv&#230;rs af 8 execution-komponenter.</div>
+      </div>
+      <div class="strip__item">
+        <div class="strip__abbr">OFI</div>
+        <div class="strip__name">Organisatorisk friktion</div>
+        <div class="strip__desc">Hvor organisationen mister energi, klarhed eller koordinering &#8212; og hvad der blokerer fremdrift.</div>
+      </div>
+      <div class="strip__item">
+        <div class="strip__abbr">EMI</div>
+        <div class="strip__name">Execution momentum</div>
+        <div class="strip__desc">Hvor execution holder fart, lukker beslutninger og leverer &#8212; eller g&#248;r det modsatte.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================
+     D. MODULE GRID — 4/4/4
+     ================================================================ -->
+<section class="section" id="moduler">
+  <div class="frame">
+    <div class="eyebrow">Tre moduler &#183; &#201;t system</div>
+    <h2 class="h-section">Tre dele af samme maskine</h2>
+    <p class="lead">Hvert modul har en pr&#230;cis rolle i systemets flow &#8212; fra signalregistrering til konsolidering til ledelsesdialog.</p>
+
+    <div class="mgrid">
+      <div class="mcard">
+        <div class="mcard__tag">Modul 01</div>
+        <h3 class="mcard__name">DataLeverand&#248;r</h3>
+        <div class="mcard__sub">Signal Capture</div>
+        <p class="mcard__desc">Til initiativ- og projektejere, der m&#229;nedligt registrerer status, beslutninger, friktioner, risici og execution-signaler.</p>
+        <div class="mcard__meta">
+          <div class="mcard__row"><span class="mcard__key">Typisk bruger</span><span class="mcard__val">Initiativansvarlig / projektleder</span></div>
+          <div class="mcard__row"><span class="mcard__key">Typisk output</span><span class="mcard__val">M&#229;nedlig submission med audit&#233;rbare execution-signaler</span></div>
+        </div>
+        <a href="https://friisnaes.github.io/strategy-data/" class="mcard__cta">&#197;bn DataLeverand&#248;r</a>
+      </div>
+
+      <div class="mcard">
+        <div class="mcard__tag">Modul 02</div>
+        <h3 class="mcard__name">Admin</h3>
+        <div class="mcard__sub">Control Tower</div>
+        <p class="mcard__desc">Til konsolidering, kvalitetssikring, SSI-beregning, governance insights, audit trail og publicering.</p>
+        <div class="mcard__meta">
+          <div class="mcard__row"><span class="mcard__key">Typisk bruger</span><span class="mcard__val">PMO / programledelse / trusted advisor</span></div>
+          <div class="mcard__row"><span class="mcard__key">Typisk output</span><span class="mcard__val">Konsolideret bundle, ledelsesindsigter og publiceret executive view</span></div>
+        </div>
+        <a href="https://friisnaes.github.io/strategy-admin/" class="mcard__cta">&#197;bn Admin</a>
+      </div>
+
+      <div class="mcard">
+        <div class="mcard__tag">Modul 03</div>
+        <h3 class="mcard__name">Management</h3>
+        <div class="mcard__sub">Executive View</div>
+        <p class="mcard__desc">Til ledelsen, programkontoret og n&#248;gleinteressenter, der skal se strategisk sundhed, friktion, momentum og handling.</p>
+        <div class="mcard__meta">
+          <div class="mcard__row"><span class="mcard__key">Typisk bruger</span><span class="mcard__val">Direktion / stabschef / Strategy Office</span></div>
+          <div class="mcard__row"><span class="mcard__key">Typisk output</span><span class="mcard__val">Read-only executive view med signaler, udvikling og handling</span></div>
+        </div>
+        <a href="https://friisnaes.github.io/strategy-mgt/" class="mcard__cta">&#197;bn Management</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ================================================================
+     E. FLOW
+     ================================================================ -->
+<section class="section">
+  <div class="frame">
+    <div class="eyebrow">S&#229;dan fungerer systemet</div>
+    <h2 class="h-section">Tre trin. &#201;n retning.</h2>
+
+    <div class="flow">
+      <div class="flow__node">
+        <div class="flow__num">1</div>
+        <h3 class="flow__title">Registr&#233;r</h3>
+        <p class="flow__desc">Initiativ- og projektejere registrerer execution-signaler i DataLeverand&#248;r. Beslutninger, friktioner, risici, sundhed og momentum.</p>
+        <div class="flow__time">15&#8211;30 min &#183; m&#229;nedligt</div>
+      </div>
+      <div class="flow__node">
+        <div class="flow__num">2</div>
+        <h3 class="flow__title">Konsolid&#233;r</h3>
+        <p class="flow__desc">Admin samler og kvalitetssikrer submissions og oms&#230;tter dem til execution-signaler, governance insights og ledelsesindsigter.</p>
+        <div class="flow__time">Admin-flowet</div>
+      </div>
+      <div class="flow__node">
+        <div class="flow__num">3</div>
+        <h3 class="flow__title">Ledelsesdialog</h3>
+        <p class="flow__desc">Management g&#248;r strategisk sundhed, friktion og momentum synligt i et roligt, beslutningsklart executive view.</p>
+        <div class="flow__time">Read-only &#183; beslutningsklar</div>
+      </div>
+    </div>
+
+    <div class="flow__coda">
+      <strong>Strategi fejler sj&#230;ldent i PowerPoint.</strong> Den fejler i drift, afh&#230;ngigheder, beslutninger og friktion. Systemet er bygget til at g&#248;re den hverdag m&#229;lbar.
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ================================================================
+     F. GUIDE TABS
+     ================================================================ -->
+<section class="section" id="guide">
+  <div class="frame">
+    <div class="eyebrow">Brugervejledninger</div>
+    <h2 class="h-section">S&#229;dan bruges hvert modul</h2>
+    <p class="lead">Korte, pr&#230;cise vejledninger til DataLeverand&#248;r, Admin og Management.</p>
+
+    <div class="gtabs">
+      <button class="gtab on" data-t="g1">DataLeverand&#248;r</button>
+      <button class="gtab" data-t="g2">Admin</button>
+      <button class="gtab" data-t="g3">Management</button>
+    </div>
+
+    <div class="gpane on" id="g1">
+      <p class="gpane__purpose">DataLeverand&#248;r bruges af initiativ- og projektejere til m&#229;nedligt at registrere de signaler, som senere indg&#229;r i SSI, OFI, EMI og &#248;vrige ledelsesindsigter.</p>
+      <div class="gpane__h4">S&#229;dan bruges modulet</div>
+      <ol class="gpane__steps">
+        <li>V&#230;lg eller bekr&#230;ft periode, rollebetegnelse og omr&#229;de.</li>
+        <li>Registr&#233;r status p&#229; initiativer og beslutninger.</li>
+        <li>Log friktioner p&#229; tv&#230;rs af funktioner &#8212; kategori, omfang og blokering.</li>
+        <li>Angiv risici med sandsynlighed, konsekvens og mitigationsplan.</li>
+        <li>Udfyld execution health: confidence, readiness, milestone progress og kapacitetsrealitet.</li>
+        <li>Gennemg&#229; preview og datakvalitetsadvarsler. Eksport&#233;r og send til Admin.</li>
+      </ol>
+      <div class="gpane__bp">
+        <div class="gpane__h4">God praksis</div>
+        <ul>
+          <li>Skriv kort og konkret &#8212; registr&#233;r signaler, ikke forklaringer.</li>
+          <li>Registr&#233;r kun det, der er sket eller er sandsynligt nu.</li>
+          <li>Brug aldrig personnavne &#8212; kun rollebetegnelser.</li>
+          <li>Modulet er til signalcapture, ikke til analyse.</li>
+        </ul>
+      </div>
+      <div class="gpane__note"><strong>Vigtigt:</strong> DataLeverand&#248;r beregner ikke officiel scoring. Det er et signalcapture-modul. Admin ejer definitioner, v&#230;gte og den endelige beregning.</div>
+    </div>
+
+    <div class="gpane" id="g2">
+      <p class="gpane__purpose">Admin er systemets kontrolt&#229;rn. Her samles submissions fra DataLeverand&#248;r, valideres, konsolideres og publiceres som audit&#233;rbare rapportbundles til Management.</p>
+      <div class="gpane__h4">S&#229;dan bruges modulet</div>
+      <ol class="gpane__steps">
+        <li>Import&#233;r submissions fra DataLeverand&#248;r &#8212; automatisk schema-migration fra v1.0&#8211;v7.0.</li>
+        <li>Kontroll&#233;r audit, schema og datakomplethed.</li>
+        <li>Gennemg&#229; KPI-komponenter, coverage og datakvalitet.</li>
+        <li>Beregn og vurd&#233;r SSI, OFI og EMI samt &#248;vrige governance-signaler.</li>
+        <li>Gennemg&#229; top drivers, friktioner, risici og ledelseshandlinger.</li>
+        <li>Public&#233;r bundle til Management og gener&#233;r relevante eksportfiler.</li>
+      </ol>
+      <div class="gpane__bp">
+        <div class="gpane__h4">God praksis</div>
+        <ul>
+          <li>Public&#233;r ikke bundle med lav datad&#230;kning uden tydelig note.</li>
+          <li>Brug coverage aktivt i fortolkning &#8212; ikke alle komponenter er altid tilg&#230;ngelige.</li>
+          <li>Admin er systemets eneste kilde til sandhed for KPI-definitioner og v&#230;gte.</li>
+          <li>Skab ledelsesmening &#8212; ikke kun datavisning.</li>
+        </ul>
+      </div>
+      <div class="gpane__note"><strong>Vigtigt:</strong> Admin er stedet, hvor metode, audit trail, fingerprint, bundle-publicering og governance-fortolkning skal v&#230;re stramme.</div>
+    </div>
+
+    <div class="gpane" id="g3">
+      <p class="gpane__purpose">Management er det read-only modul, hvor ledelsen f&#229;r et samlet billede af execution-sundhed, udvikling og n&#248;dvendige handlinger.</p>
+      <div class="gpane__h4">S&#229;dan bruges modulet</div>
+      <ol class="gpane__steps">
+        <li>Import&#233;r publiceret bundle fra Admin.</li>
+        <li>Se SSI, OFI og EMI samt &#248;vrige executive signaler.</li>
+        <li>Gennemg&#229; Executive Snapshot &#8212; de vigtigste signaler p&#229; &#233;n side.</li>
+        <li>Se top positive og negative drivers.</li>
+        <li>Brug trends og logs til at forst&#229; retning og vedvarende problemer.</li>
+        <li>Brug print/export ved direktion, styregruppe eller board-forberedelse.</li>
+      </ol>
+      <div class="gpane__bp">
+        <div class="gpane__h4">God praksis</div>
+        <ul>
+          <li>L&#230;s SSI som et signal &#8212; ikke som et facit.</li>
+          <li>Kombin&#233;r tal med ledelsesm&#230;ssig d&#248;mmekraft.</li>
+          <li>Fokus&#233;r p&#229; handlinger, friktion og momentum f&#248;r detaljer.</li>
+          <li>Brug modulet som f&#230;lles beslutningsbillede, ikke som kontrolv&#230;rkt&#248;j.</li>
+        </ul>
+      </div>
+      <div class="gpane__note"><strong>Vigtigt:</strong> Management er l&#230;sefladen. Ikke beregningsmotoren. Ikke admin. Ikke strategy office. Det er executive viewet.</div>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ================================================================
+     G. METHOD — 6/6 heavy split
+     ================================================================ -->
+<section class="section section--heavy" id="metode">
+  <div class="frame">
+    <div class="eyebrow">Metode og afgr&#230;nsning</div>
+    <h2 class="h-section">Hvad systemet er &#8212; og hvad det ikke er</h2>
+
+    <div class="method">
+      <div>
+        <h3 class="method__heading">Hvad systemet g&#248;r</h3>
+        <ul class="method__list method__list--do">
+          <li>G&#248;r execution-signaler l&#230;sbare og strukturerede</li>
+          <li>Samler friktion, fremdrift og ledelsesrelevante signaler p&#229; tv&#230;rs af initiativer</li>
+          <li>Giver et f&#230;lles, audit&#233;rbart beslutningsbillede for ledelsen</li>
+          <li>Underst&#248;tter ledelsesdialog med verificerbar data</li>
+          <li>Synligg&#248;r datakvalitet, coverage og begr&#230;nsninger transparent</li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="method__heading">Hvad systemet ikke g&#248;r</h3>
+        <ul class="method__list method__list--dont">
+          <li>Erstatter ikke Strategy Office, kvalitativ vurdering eller ledelsesintuition</li>
+          <li>Erstatter ikke menneskelig d&#248;mmekraft i fortolkning af signaler</li>
+          <li>M&#229;ler ikke finansielle resultater, oms&#230;tning eller ROI direkte</li>
+          <li>G&#248;r ikke strategi god af sig selv &#8212; strategi kr&#230;ver stadig ledelse</li>
+          <li>Erstatter ikke governance, beslutningsprocesser eller organisatorisk modenhed</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="method__ssi">
+      <strong>SSI &#8212; Strategy Execution Index</strong>
+      <p>SSI er et ledelsessignal &#8212; ikke et m&#229;l i sig selv. Det er et diagnostisk indeks, der hj&#230;lper ledelsen med at identificere execution gaps tidligere, f&#248;r de bliver dyre. Scores b&#248;r altid kontekstualiseres med kvalitativ vurdering fra programmets interessenter.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ================================================================
+     H. REFERENCES — 2-col editorial
+     ================================================================ -->
+<section class="section" id="referencer">
+  <div class="frame">
+    <div class="eyebrow">Fagligt fundament</div>
+    <h2 class="h-section">Best practice og &#229;bne referencer</h2>
+    <p class="lead">Hvad st&#248;rre konsulenthuse og &#229;bne thought-leadership-kilder peger p&#229; som afg&#248;rende for strategieksekvering.</p>
+
+    <div class="refs">
+      <div class="ref">
+        <div class="ref__source">McKinsey</div>
+        <div class="ref__title">The role of the transformation office</div>
+        <div class="ref__desc">Hvorfor et uafh&#230;ngigt transformation office med ugentlig rytme og standardiserede processer er afg&#248;rende for execution-disciplin.</div>
+        <a href="https://www.mckinsey.com/capabilities/transformation/our-insights/the-role-of-the-transformation-office" target="_blank" rel="noopener" class="ref__link">L&#230;s &#8594;</a>
+      </div>
+      <div class="ref">
+        <div class="ref__source">McKinsey</div>
+        <div class="ref__title">How to create a transformation roadmap</div>
+        <div class="ref__desc">Sekvensering, horisontmodeller og integrering af transformation med daglig drift. Performance management som strategi-h&#229;rdwiring.</div>
+        <a href="https://www.mckinsey.com/capabilities/transformation/our-insights/defining-your-true-north-a-road-map-to-successful-transformation" target="_blank" rel="noopener" class="ref__link">L&#230;s &#8594;</a>
+      </div>
+      <div class="ref">
+        <div class="ref__source">McKinsey</div>
+        <div class="ref__title">How Strategy Champions win</div>
+        <div class="ref__desc">Mobilisering er det st&#248;rste gap mellem strategivindere og resten. 12 byggeklodser fra design til eksekvering.</div>
+        <a href="https://www.mckinsey.com/capabilities/strategy-and-corporate-finance/our-insights/how-strategy-champions-win" target="_blank" rel="noopener" class="ref__link">L&#230;s &#8594;</a>
+      </div>
+      <div class="ref">
+        <div class="ref__source">BCG &#215; PMI</div>
+        <div class="ref__title">Strategic Initiative Management: The PMO Imperative</div>
+        <div class="ref__desc">Fire imperativer for strategiske PMO&#8217;er: fokus p&#229; kritiske initiativer, processer, talent og forandringskultur.</div>
+        <a href="https://www.bcg.com/publications/2013/program_management_change_management_strategic_initiative_management_pmo_imperative" target="_blank" rel="noopener" class="ref__link">L&#230;s &#8594;</a>
+      </div>
+      <div class="ref">
+        <div class="ref__source">BCG</div>
+        <div class="ref__title">Strategy Enablement Center</div>
+        <div class="ref__desc">Strategisk kapabilitetsopbygning som organisatorisk kompetence &#8212; hvorfor strategi skal ejes bredt, ikke kun centralt.</div>
+        <a href="https://www.bcg.com/capabilities/strategy/strategy-enablement-center" target="_blank" rel="noopener" class="ref__link">L&#230;s &#8594;</a>
+      </div>
+      <div class="ref">
+        <div class="ref__source">Deloitte Monitor</div>
+        <div class="ref__title">StrategyAccelerator</div>
+        <div class="ref__desc">Transformation program management med fokus p&#229; transparens, accountability og benefit realization fra id&#233; til realisering.</div>
+        <a href="https://www.deloitte.com/us/en/services/consulting/services/strategyaccelerator-strategy-and-execution-tool.html" target="_blank" rel="noopener" class="ref__link">L&#230;s &#8594;</a>
+      </div>
+      <div class="ref">
+        <div class="ref__source">Deloitte</div>
+        <div class="ref__title">The Future of Board Governance Framework</div>
+        <div class="ref__desc">Governance-infrastruktur som fundament for effektiv bestyrelses- og ledelsesoverv&#229;gning af strategi og risiko.</div>
+        <a href="https://www.deloitte.com/us/en/services/consulting/articles/framing-the-future-of-corporate-governance-deloitte-governance-framework.html" target="_blank" rel="noopener" class="ref__link">L&#230;s &#8594;</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     I. CLOSING — heavy positioning panel
+     ================================================================ -->
+<section class="closing">
+  <div class="frame">
+    <p class="closing__statement">Strategi bryder sj&#230;ldent sammen i m&#248;delokalet.<br>Den bryder sammen i drift, afh&#230;ngigheder, beslutninger og friktion.</p>
+    <p class="closing__sub">Strategy Execution Observatory&#8482; er bygget til at g&#248;re de signaler synlige, f&#248;r de bliver dyre.</p>
+    <div class="closing__ctas">
+      <a href="https://friisnaes.github.io/strategy-data/" class="btn btn--gold">DataLeverand&#248;r</a>
+      <a href="https://friisnaes.github.io/strategy-admin/" class="btn btn--ghost">Admin</a>
+      <a href="https://friisnaes.github.io/strategy-mgt/" class="btn btn--ghost">Management</a>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     J. FOOTER
+     ================================================================ -->
+<footer class="footer">
+  <div class="frame">
+    <div class="footer__inner">
+      <span class="footer__brand">Strategy Execution Observatory&#8482;</span>
+      <span class="footer__note">Launcher v1.0 &#183; Observatory v7.0<br>Signal-system for strategisk eksekvering &#183; Intern og klientrettet brug</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ================================================================
+     JS — minimal, functional
+     ================================================================ -->
+<script>
+(function(){
+  var tb=document.getElementById('topbar');
+  window.addEventListener('scroll',function(){
+    tb.classList.toggle('scrolled',window.scrollY>28);
+  },{passive:true});
+
+  var tog=document.getElementById('navToggle');
+  var nl=document.getElementById('navLinks');
+  tog.addEventListener('click',function(){nl.classList.toggle('open')});
+  for(var a=nl.querySelectorAll('a'),i=0;i<a.length;i++){
+    a[i].addEventListener('click',function(){nl.classList.remove('open')});
+  }
+
+  var tabs=document.querySelectorAll('.gtab');
+  var panes=document.querySelectorAll('.gpane');
+  for(var j=0;j<tabs.length;j++){
+    tabs[j].addEventListener('click',function(){
+      var id=this.getAttribute('data-t');
+      for(var k=0;k<tabs.length;k++){tabs[k].classList.remove('on')}
+      for(var m=0;m<panes.length;m++){panes[m].classList.remove('on')}
+      this.classList.add('on');
+      document.getElementById(id).classList.add('on');
+    });
+  }
+})();
+</script>
+</body>
+</html>
